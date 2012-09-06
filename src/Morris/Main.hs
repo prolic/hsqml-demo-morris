@@ -4,7 +4,6 @@ module Main where
 import Morris.Board
 
 import Graphics.QML
-import Network.URI
 import Data.Maybe
 import Data.List
 import Data.Typeable
@@ -193,7 +192,7 @@ main = do
     ctx <- newObject $ MainObj
     qml <- getDataFileName "morris.qml"
     createEngine defaultEngineConfig {
-        initialURL = fromJust $ parseURIReference qml,
+        initialURL = filePathToURI qml,
         initialWindowState = ShowWindowWithTitle "HsQML Morris",
         contextObject = Just ctx}
     runEngines
