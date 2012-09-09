@@ -27,3 +27,7 @@ Executable hsqml-morris
         network    == 2.3.*,
         OddWord    == 1.0.*,
         hsqml      == 0.1.*
+
+Source-repository head
+    type:     darcs
+    location: https://patch-tag.com/r/komadori/hsqml-morris
