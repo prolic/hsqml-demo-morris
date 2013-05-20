@@ -25,9 +25,8 @@ Executable hsqml-morris
         Morris.Board
     Build-depends:
         base       == 4.*,
-        containers == 0.4.*,
-        directory  == 1.1.*,
-        network    == 2.3.*,
+        containers >= 0.4 && < 0.6,
+        directory  >= 1.1 && < 1.3,
         OddWord    == 1.0.*,
         hsqml      == 0.1.*
 
