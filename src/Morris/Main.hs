@@ -194,5 +194,5 @@ main = do
     runEngine defaultEngineConfig {
         initialURL = filePathToURI qml,
         initialWindowState = ShowWindowWithTitle "HsQML Morris",
-        contextObject = Just ctx}
+        contextObject = Just $ anyObjRef ctx}
 
