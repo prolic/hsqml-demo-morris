@@ -191,7 +191,7 @@ main :: IO ()
 main = do
     ctx <- newObject $ MainObj
     qml <- getDataFileName "morris.qml"
-    runEngine defaultEngineConfig {
+    runEngineLoop defaultEngineConfig {
         initialURL = filePathToURI qml,
         initialWindowState = ShowWindowWithTitle "HsQML Morris",
         contextObject = Just $ anyObjRef ctx}
