@@ -32,4 +32,4 @@ Executable hsqml-morris
 
 Source-repository head
     type:     darcs
-    location: https://patch-tag.com/r/komadori/hsqml-morris
+    location: http://hub.darcs.net/komadori/hsqml-morris
