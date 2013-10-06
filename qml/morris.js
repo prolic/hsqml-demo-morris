@@ -73,18 +73,24 @@ function animFinished()
     var d = isPlayerAI(game.player);
     if (d > 0) {
         if (0 == aiMove.length) {
-            var move = game.getAIMove(d);
-            for (var j=move.count-1; j>=0; j--) {
-                aiMove.push(move.elem(j));
-            }
+            game.aiReady.connect(aiReadyCallback);
+            game.startAI(d);
         }
-        if (0 != aiMove.length) {
+        else {
             selectTarget(aiMove.pop());
         }
     }
     else {
         updateTargets();
     }
+}
+
+function aiReadyCallback(move)
+{
+    for (var j=move.count-1; j>=0; j--) {
+        aiMove.push(move.elem(j));
+    }
+    animFinished();
 }
 
 function isPlayerAI(p)

@@ -1,5 +1,6 @@
 module Morris.Board where
 
+import Control.DeepSeq
 import Data.Word
 import Data.Word.Odd
 import Data.Bits
@@ -13,6 +14,8 @@ import Numeric
 newtype Board = Board Word64 deriving (Eq, Ord, Show)
 
 newtype Position = Position Int deriving (Eq, Ord, Show)
+
+instance NFData Position
 
 data FirstAction
     = Place Position

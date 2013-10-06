@@ -4,8 +4,12 @@ module Main where
 import Morris.Board
 
 import Graphics.QML
+import Control.Concurrent
+import Control.DeepSeq
+import Control.Exception
 import Data.Maybe
 import Data.List
+import Data.Tagged
 import Data.Typeable
 import Data.IntMap (IntMap)
 import qualified Data.IntMap as IntMap
@@ -114,10 +118,13 @@ getActions :: GameObj -> IO (ObjRef PosListObj)
 getActions gs =
     newObject $ PosListObj $ gameActions gs
 
-getAIMove :: GameObj -> Int -> IO (ObjRef PosListObj)
-getAIMove gs d =
-    newObject $ PosListObj $
-    maybe [] moveToPositions $ aiMove d (gameBias gs) $ gameBoard gs
+startAI :: ObjRef GameObj -> Int -> IO ()
+startAI gsRef d = fmap (const ()) $ forkIO $ do
+    let gs = fromObjRef gsRef
+        ps = maybe [] moveToPositions $ aiMove d (gameBias gs) $ gameBoard gs
+    evaluate $ force ps
+    posObj <- newObject $ PosListObj ps
+    fireSignal (Tagged gsRef :: Tagged AIReady (ObjRef GameObj)) posObj
 
 selectTarget :: GameObj -> Int -> IO (ObjRef GameObj)
 selectTarget gs i =
@@ -162,12 +169,18 @@ getPositionAtIndex gs i =
         Nothing -> -1
         Just (_,Position pos) -> pos
 
+data AIReady deriving Typeable
+
+instance SignalKey AIReady where
+    type SignalParams AIReady = ObjRef PosListObj -> IO ()
+
 instance Object GameObj where
     classDef = defClass [
         defPropertyRO "player" getPlayer,
         defPropertyRO "targets" getTargets,
         defPropertyRO "actions" getActions,
-        defMethod "getAIMove" getAIMove,
+        defMethod "startAI" startAI,
+        defSignal (Tagged "aiReady" :: Tagged AIReady String),
         defMethod "selectTarget" selectTarget,
         defPropertyRO "indexCount" getIndexCount,
         defMethod "idxPlayer" getPlayerAtIndex,

@@ -26,7 +26,9 @@ Executable hsqml-morris
     Build-depends:
         base       == 4.*,
         containers >= 0.4 && < 0.6,
+        deepseq    >= 1.2 && < 1.4,
         directory  >= 1.1 && < 1.3,
+        tagged     >= 0.4 && < 0.7,
         OddWord    == 1.0.*,
         hsqml      == 0.1.*
 
