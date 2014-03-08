@@ -16,7 +16,7 @@ import qualified Data.IntMap as IntMap
 import Data.Map (Map)
 import qualified Data.Map as Map
 
-import Paths_hsqml_morris
+import Paths_hsqml_demo_morris
 
 newtype IdBoard = IdBoard (IntMap (Player, Position))
 
