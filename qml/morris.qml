@@ -1,4 +1,4 @@
-import Qt 4.7
+import QtQuick 2.0
 import "morris.js" as Morris
 
 Image {
@@ -26,9 +26,9 @@ Image {
         model: [];
         Image {
             source: modelData.red ? "red.svg" : "black.svg";
-            opacity: (modelData.endVis*t)+(modelData.startVis*(1-t));
-            x: (Morris.posIdToX(modelData.endIdx)*t)+(Morris.posIdToX(modelData.startIdx)*(1-t))-width/2;
-            y: (Morris.posIdToY(modelData.endIdx)*t)+(Morris.posIdToY(modelData.startIdx)*(1-t))-height/2;
+            opacity: (modelData.endVis*board.t)+(modelData.startVis*(1-board.t));
+            x: (Morris.posIdToX(modelData.endIdx)*board.t)+(Morris.posIdToX(modelData.startIdx)*(1-board.t))-width/2;
+            y: (Morris.posIdToY(modelData.endIdx)*board.t)+(Morris.posIdToY(modelData.startIdx)*(1-board.t))-height/2;
         }
     }
 

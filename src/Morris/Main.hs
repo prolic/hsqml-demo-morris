@@ -206,6 +206,5 @@ main = do
     qml <- getDataFileName "morris.qml"
     runEngineLoop defaultEngineConfig {
         initialDocument = fileDocument qml,
-        initialWindowState = ShowWindowWithTitle "HsQML Morris",
         contextObject = Just $ anyObjRef ctx}
 
