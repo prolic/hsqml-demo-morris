@@ -9,15 +9,20 @@ Image {
 
     property real t;
 
-    SequentialAnimation on t {
+    NumberAnimation on t {
         id: anim;
-        NumberAnimation {
-            from: 0;
-            to: 1;
-            duration: 300;
-        }
-        ScriptAction {
-            script: Morris.animFinished();
+        running: false;
+        from: 0;
+        to: 1;
+        duration: 300;
+    }
+
+    Connections {
+        target: anim;
+        onRunningChanged: {
+            if (!anim.running) {
+                Morris.animFinished();
+            }
         }
     }
 
