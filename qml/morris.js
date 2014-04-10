@@ -87,6 +87,9 @@ function animFinished()
 
 function aiReadyCallback(move)
 {
+    if (move.count == 0) {
+        return;
+    }
     for (var j=move.count-1; j>=0; j--) {
         aiMove.push(move.elem(j));
     }
