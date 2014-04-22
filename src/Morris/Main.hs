@@ -90,7 +90,7 @@ instance Object PosListObj where
         defPropertyRO "count" posListCount]
 
 instance Marshal PosListObj where
-    type MarshalMode PosListObj = ModeObjFrom PosListObj
+    type MarshalMode PosListObj c d = ModeObjFrom PosListObj c
     marshaller = objSimpleMarshaller
 
 data GameObj = GameObj {
@@ -187,7 +187,7 @@ instance Object GameObj where
         defMethod "idxPosition" getPositionAtIndex]
 
 instance Marshal GameObj where
-    type MarshalMode GameObj = ModeObjFrom GameObj
+    type MarshalMode GameObj c d = ModeObjFrom GameObj c
     marshaller = objSimpleMarshaller
 
 createGame :: ObjRef MainObj -> IO (ObjRef GameObj)
