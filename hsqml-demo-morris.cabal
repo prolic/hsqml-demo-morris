@@ -28,6 +28,7 @@ Executable hsqml-morris
         containers >= 0.4 && < 0.6,
         deepseq    >= 1.2 && < 1.4,
         directory  >= 1.1 && < 1.3,
+        text       >= 0.11 && < 1.2,
         tagged     >= 0.4 && < 0.8,
         OddWord    == 1.0.*,
         hsqml      == 0.3.*

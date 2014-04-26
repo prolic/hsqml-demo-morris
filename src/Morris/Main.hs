@@ -10,6 +10,8 @@ import Control.Exception
 import Data.Maybe
 import Data.List
 import Data.Tagged
+import Data.Text (Text)
+import qualified Data.Text as T
 import Data.Typeable
 import Data.IntMap (IntMap)
 import qualified Data.IntMap as IntMap
@@ -100,11 +102,11 @@ data GameObj = GameObj {
     gameBias :: Map Board Float}
     deriving Typeable
 
-getPlayer :: GameObj -> IO String
+getPlayer :: GameObj -> IO Text
 getPlayer gs =
     return $ case getBoardNextPlayer $ gameBoard gs of
-        Red   -> "red"
-        Black -> "black"
+        Red   -> T.pack "red"
+        Black -> T.pack "black"
  
 getTargets :: GameObj -> IO (ObjRef PosListObj)
 getTargets gs =
@@ -156,12 +158,12 @@ getIndexCount :: GameObj -> IO Int
 getIndexCount gs =
     return $ getIdBoardCount $ gameIdBoard gs
 
-getPlayerAtIndex :: GameObj -> Int -> IO String
+getPlayerAtIndex :: GameObj -> Int -> IO Text
 getPlayerAtIndex gs i =
     return $ case getIdBoardPiece i $ gameIdBoard gs of
-        Nothing -> "none"
-        Just (Red,_) -> "red"
-        Just (Black,_) -> "black"
+        Nothing -> T.pack "none"
+        Just (Red,_) -> T.pack "red"
+        Just (Black,_) -> T.pack "black"
 
 getPositionAtIndex :: GameObj -> Int -> IO Int
 getPositionAtIndex gs i =
