@@ -21,7 +21,6 @@ Executable hsqml-morris
     Hs-source-dirs: src
     Main-is: Morris/Main.hs
     Other-modules:
-        Morris.Main
         Morris.Board
     Build-depends:
         base       == 4.*,
