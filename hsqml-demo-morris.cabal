@@ -31,6 +31,7 @@ Executable hsqml-morris
         tagged     >= 0.4 && < 0.8,
         OddWord    == 1.0.*,
         hsqml      == 0.3.*
+    GHC-options: -threaded
 
 Source-repository head
     type:     darcs
