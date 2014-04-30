@@ -93,7 +93,7 @@ instance Object PosListObj where
 
 instance Marshal PosListObj where
     type MarshalMode PosListObj c d = ModeObjFrom PosListObj c
-    marshaller = objSimpleMarshaller
+    marshaller = fromMarshaller fromObjRef
 
 data GameObj = GameObj {
     gameBoard :: Board,
@@ -190,7 +190,7 @@ instance Object GameObj where
 
 instance Marshal GameObj where
     type MarshalMode GameObj c d = ModeObjFrom GameObj c
-    marshaller = objSimpleMarshaller
+    marshaller = fromMarshaller fromObjRef
 
 createGame :: ObjRef MainObj -> IO (ObjRef GameObj)
 createGame _ =
