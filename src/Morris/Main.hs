@@ -7,9 +7,9 @@ import Graphics.QML
 import Control.Concurrent
 import Control.DeepSeq
 import Control.Exception
-import Data.Maybe
 import Data.List
-import Data.Tagged
+import Data.Maybe
+import Data.Proxy
 import Data.Text (Text)
 import qualified Data.Text as T
 import Data.Typeable
@@ -86,8 +86,8 @@ posListCount :: PosListObj -> IO Int
 posListCount (PosListObj posList) =
     return $ length posList
 
-instance Object PosListObj where
-    classDef = defClass [
+instance DefaultClass PosListObj where
+    classMembers = [
         defMethod "elem" posListElem,
         defPropertyRO "count" posListCount]
 
@@ -112,21 +112,21 @@ getTargets :: GameObj -> IO (ObjRef PosListObj)
 getTargets gs =
     let actions = gameActions gs
         posOff  = length actions
-    in newObject $ PosListObj $ nub $ map (!! posOff) $
+    in newObjectDC $ PosListObj $ nub $ map (!! posOff) $
         filter (isPrefixOf actions) $ map moveToPositions $
         legalMoves $ gameBoard gs
 
 getActions :: GameObj -> IO (ObjRef PosListObj)
 getActions gs =
-    newObject $ PosListObj $ gameActions gs
+    newObjectDC $ PosListObj $ gameActions gs
 
 startAI :: ObjRef GameObj -> Int -> IO ()
 startAI gsRef d = fmap (const ()) $ forkIO $ do
     let gs = fromObjRef gsRef
         ps = maybe [] moveToPositions $ aiMove d (gameBias gs) $ gameBoard gs
     evaluate $ force ps
-    posObj <- newObject $ PosListObj ps
-    fireSignal (Tagged gsRef :: Tagged AIReady (ObjRef GameObj)) posObj
+    posObj <- newObjectDC $ PosListObj ps
+    fireSignal (Proxy :: Proxy AIReady) gsRef posObj
 
 selectTarget :: GameObj -> Int -> IO (ObjRef GameObj)
 selectTarget gs i =
@@ -143,7 +143,7 @@ selectTarget gs i =
             (last as, concatMap actionToPositions as)) actionLists
         maybeAction = fmap fst $ find ((actions' ==) . snd) actionTargets
         iboard' = maybe iboard (\a -> playActionId player a iboard) maybeAction
-    in newObject $ case maybeMove of
+    in newObjectDC $ case maybeMove of
         Just move -> gs {
             gameBoard = board',
             gameIdBoard = iboard',
@@ -173,16 +173,16 @@ getPositionAtIndex gs i =
 
 data AIReady deriving Typeable
 
-instance SignalKey AIReady where
+instance SignalKeyClass AIReady where
     type SignalParams AIReady = ObjRef PosListObj -> IO ()
 
-instance Object GameObj where
-    classDef = defClass [
+instance DefaultClass GameObj where
+    classMembers = [
         defPropertyRO "player" getPlayer,
         defPropertyRO "targets" getTargets,
         defPropertyRO "actions" getActions,
         defMethod "startAI" startAI,
-        defSignal (Tagged "aiReady" :: Tagged AIReady String),
+        defSignal "aiReady" (Proxy :: Proxy AIReady),
         defMethod "selectTarget" selectTarget,
         defPropertyRO "indexCount" getIndexCount,
         defMethod "idxPlayer" getPlayerAtIndex,
@@ -194,17 +194,17 @@ instance Marshal GameObj where
 
 createGame :: ObjRef MainObj -> IO (ObjRef GameObj)
 createGame _ =
-    newObject $ GameObj newBoard newIdBoard [] Map.empty
+    newObjectDC $ GameObj newBoard newIdBoard [] Map.empty
 
 data MainObj = MainObj deriving Typeable
 
-instance Object MainObj where
-    classDef = defClass [
+instance DefaultClass MainObj where
+    classMembers = [
         defMethod "createGame" createGame]
 
 main :: IO ()
 main = do
-    ctx <- newObject $ MainObj
+    ctx <- newObjectDC $ MainObj
     qml <- getDataFileName "morris.qml"
     runEngineLoop defaultEngineConfig {
         initialDocument = fileDocument qml,
