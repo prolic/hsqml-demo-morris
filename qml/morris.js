@@ -6,13 +6,7 @@ var aiMove = [];
 
 function updateTargets()
 {
-    var next = game.targets;
-    var count = next.count;
-    var targets = [];
-    for (var i=0; i<count; i++) {
-        targets.push(next.elem(i));
-    }
-    targetView.model = targets;
+    targetView.model = game.targets;
 }
 
 function clearTargets()
@@ -87,11 +81,11 @@ function animFinished()
 
 function aiReadyCallback(move)
 {
-    if (move.count == 0) {
+    if (move.length == 0) {
         return;
     }
-    for (var j=move.count-1; j>=0; j--) {
-        aiMove.push(move.elem(j));
+    for (var j=move.length-1; j>=0; j--) {
+        aiMove.push(move[j]);
     }
     animFinished();
 }

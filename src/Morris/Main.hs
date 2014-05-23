@@ -76,24 +76,9 @@ actionToPositions (SecondAction (Take p1))   = [p1]
 moveToPositions :: Move -> [Position]
 moveToPositions = concatMap actionToPositions . moveToActions
 
-data PosListObj = PosListObj [Position] deriving Typeable
-
-posListElem :: PosListObj -> Int -> IO Int
-posListElem (PosListObj posList) idx =
-    return $ (\(Position i) -> i) $ posList !! idx
-
-posListCount :: PosListObj -> IO Int
-posListCount (PosListObj posList) =
-    return $ length posList
-
-instance DefaultClass PosListObj where
-    classMembers = [
-        defMethod "elem" posListElem,
-        defPropertyRO "count" posListCount]
-
-instance Marshal PosListObj where
-    type MarshalMode PosListObj c d = ModeObjFrom PosListObj c
-    marshaller = fromMarshaller fromObjRef
+instance Marshal Position where
+    type MarshalMode Position c d = ModeBidi c
+    marshaller = bidiMarshaller Position (\(Position i) -> i)
 
 data GameObj = GameObj {
     gameBoard :: Board,
@@ -108,25 +93,23 @@ getPlayer gs =
         Red   -> T.pack "red"
         Black -> T.pack "black"
  
-getTargets :: GameObj -> IO (ObjRef PosListObj)
+getTargets :: GameObj -> IO [Position]
 getTargets gs =
     let actions = gameActions gs
         posOff  = length actions
-    in newObjectDC $ PosListObj $ nub $ map (!! posOff) $
+    in return $ nub $ map (!! posOff) $
         filter (isPrefixOf actions) $ map moveToPositions $
         legalMoves $ gameBoard gs
 
-getActions :: GameObj -> IO (ObjRef PosListObj)
-getActions gs =
-    newObjectDC $ PosListObj $ gameActions gs
+getActions :: GameObj -> IO [Position]
+getActions = return . gameActions
 
 startAI :: ObjRef GameObj -> Int -> IO ()
 startAI gsRef d = fmap (const ()) $ forkIO $ do
     let gs = fromObjRef gsRef
         ps = maybe [] moveToPositions $ aiMove d (gameBias gs) $ gameBoard gs
     evaluate $ force ps
-    posObj <- newObjectDC $ PosListObj ps
-    fireSignal (Proxy :: Proxy AIReady) gsRef posObj
+    fireSignal (Proxy :: Proxy AIReady) gsRef ps
 
 selectTarget :: GameObj -> Int -> IO (ObjRef GameObj)
 selectTarget gs i =
@@ -174,7 +157,7 @@ getPositionAtIndex gs i =
 data AIReady deriving Typeable
 
 instance SignalKeyClass AIReady where
-    type SignalParams AIReady = ObjRef PosListObj -> IO ()
+    type SignalParams AIReady = [Position] -> IO ()
 
 instance DefaultClass GameObj where
     classMembers = [
@@ -192,7 +175,7 @@ instance Marshal GameObj where
     type MarshalMode GameObj c d = ModeObjFrom GameObj c
     marshaller = fromMarshaller fromObjRef
 
-createGame :: ObjRef MainObj -> IO (ObjRef GameObj)
+createGame :: ObjRef () -> IO (ObjRef GameObj)
 createGame _ =
     newObjectDC $ GameObj newBoard newIdBoard [] Map.empty
 
