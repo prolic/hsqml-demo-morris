@@ -196,15 +196,10 @@ createGame :: ObjRef MainObj -> IO (ObjRef GameObj)
 createGame _ =
     newObjectDC $ GameObj newBoard newIdBoard [] Map.empty
 
-data MainObj = MainObj deriving Typeable
-
-instance DefaultClass MainObj where
-    classMembers = [
-        defMethod "createGame" createGame]
-
 main :: IO ()
 main = do
-    ctx <- newObjectDC $ MainObj
+    clazz <- newClass [defMethod "createGame" createGame]
+    ctx <- newObject clazz ()
     qml <- getDataFileName "morris.qml"
     runEngineLoop defaultEngineConfig {
         initialDocument = fileDocument qml,
