@@ -76,6 +76,16 @@ actionToPositions (SecondAction (Take p1))   = [p1]
 moveToPositions :: Move -> [Position]
 moveToPositions = concatMap actionToPositions . moveToActions
 
+instance Marshal Player where
+    type MarshalMode Player c d = ModeBidi c
+    marshaller = bidiMarshaller from to
+        where from txt = case T.unpack txt of
+                  "red" -> Red
+                  _     -> Black
+              to plyr = T.pack $ case plyr of
+                  Red   -> "red"
+                  Black -> "black"
+
 instance Marshal Position where
     type MarshalMode Position c d = ModeBidi c
     marshaller = bidiMarshaller Position (\(Position i) -> i)
@@ -87,11 +97,8 @@ data GameObj = GameObj {
     gameBias :: Map Board Float}
     deriving Typeable
 
-getPlayer :: GameObj -> IO Text
-getPlayer gs =
-    return $ case getBoardNextPlayer $ gameBoard gs of
-        Red   -> T.pack "red"
-        Black -> T.pack "black"
+getPlayer :: GameObj -> IO Player
+getPlayer = return . getBoardNextPlayer . gameBoard
  
 getTargets :: GameObj -> IO [Position]
 getTargets gs =
@@ -141,12 +148,9 @@ getIndexCount :: GameObj -> IO Int
 getIndexCount gs =
     return $ getIdBoardCount $ gameIdBoard gs
 
-getPlayerAtIndex :: GameObj -> Int -> IO Text
+getPlayerAtIndex :: GameObj -> Int -> IO (Maybe Player)
 getPlayerAtIndex gs i =
-    return $ case getIdBoardPiece i $ gameIdBoard gs of
-        Nothing -> T.pack "none"
-        Just (Red,_) -> T.pack "red"
-        Just (Black,_) -> T.pack "black"
+    return $ fmap fst $ getIdBoardPiece i $ gameIdBoard gs
 
 getPositionAtIndex :: GameObj -> Int -> IO Int
 getPositionAtIndex gs i =
