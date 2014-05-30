@@ -16,29 +16,8 @@ function clearTargets()
 
 function updatePieces()
 {
-    var count = game.indexCount;
-    var pieces = [];
-    var hasAnim = false;
-    for (var i=0; i<count; i++) {
-        var currIdx = game.idxPosition(i);
-        var prevIdx = prevGame.idxPosition(i);
-
-        if (-1 != prevIdx || -1 != currIdx) {
-            var startIdx = (-1 != prevIdx) ? prevIdx : currIdx;
-            var endIdx = (-1 != currIdx) ? currIdx : prevIdx;
-            var startVis = (-1 != prevIdx) ? 1 : 0;
-            var endVis = (-1 != currIdx) ? 1 : 0;
-            hasAnim |= (startIdx != endIdx) || (startVis != endVis);
-            pieces.push({
-                startIdx: startIdx,
-                endIdx: endIdx,
-                startVis: startVis,
-                endVis: endVis,
-                red: 'red' == game.idxPlayer(i)});
-        }
-    }
-    pieceView.model = pieces;
-    if (hasAnim) {
+    pieceView.model = game.pieces;
+    if (game.actions.length == 0) {
         anim.restart();
     }
     else {

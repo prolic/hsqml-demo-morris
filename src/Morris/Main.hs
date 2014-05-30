@@ -54,14 +54,6 @@ playActionId :: Player -> Action -> IdBoard -> IdBoard
 playActionId player (FirstAction act) = playFirstActionId player act
 playActionId _ (SecondAction act) = playSecondActionId act
 
-getIdBoardCount :: IdBoard -> Int
-getIdBoardCount (IdBoard m) =
-    if IntMap.null m then 0 else (1+) $ fst $ IntMap.findMax m
-
-getIdBoardPiece :: Int -> IdBoard -> Maybe (Player,Position)
-getIdBoardPiece i (IdBoard m) =
-    IntMap.lookup i m
-
 moveToActions :: Move -> [Action]
 moveToActions (FullMove act1 Nothing) =
     [FirstAction act1]
@@ -94,11 +86,41 @@ data GameObj = GameObj {
     gameBoard :: Board,
     gameIdBoard :: IdBoard,
     gameActions :: [Position],
-    gameBias :: Map Board Float}
+    gameBias :: Map Board Float,
+    gamePrev :: Maybe GameObj}
     deriving Typeable
+
+data PieceObj = PieceObj {
+    piecePlayer :: Player,
+    piecePrevPos :: Maybe Position,
+    pieceCurrPos :: Maybe Position}
+    deriving (Typeable, Show)
+
+retIO :: a -> IO a
+retIO = return
+
+instance DefaultClass PieceObj where
+    classMembers = [
+        defMethod "player" $ retIO . piecePlayer,
+        defMethod "currPos" $ retIO . pieceCurrPos,
+        defMethod "prevPos" $ retIO . piecePrevPos]
+
+instance Marshal PieceObj where
+    type MarshalMode PieceObj c d = ModeObjFrom PieceObj c
+    marshaller = fromMarshaller fromObjRef
 
 getPlayer :: GameObj -> IO Player
 getPlayer = return . getBoardNextPlayer . gameBoard
+
+getPieces :: GameObj -> IO [ObjRef PieceObj]
+getPieces gs =
+    let (IdBoard ib) = gameIdBoard $ fromMaybe gs $ gamePrev gs
+        (IdBoard ib') = gameIdBoard gs
+        merge _ (plyr,p) (_,p') = Just $ PieceObj plyr (Just p) (Just p')
+        oldMap = fmap $ \(plyr,p) -> PieceObj plyr (Just p) Nothing
+        newMap = fmap $ \(plyr,p') -> PieceObj plyr Nothing (Just p')
+        ps = IntMap.elems $ IntMap.mergeWithKey merge oldMap newMap ib ib'
+    in mapM newObjectDC ps
  
 getTargets :: GameObj -> IO [Position]
 getTargets gs =
@@ -139,24 +161,12 @@ selectTarget gs i =
             gameIdBoard = iboard',
             gameActions = [],
             gameBias = {-Map.map (*0.9) $-} Map.alter (\x ->
-                Just $ fromMaybe 0 x - 0.5) board' $ gameBias gs}
+                Just $ fromMaybe 0 x - 0.5) board' $ gameBias gs,
+            gamePrev = Just gs}
         Nothing -> gs {
             gameIdBoard = iboard',
-            gameActions = actions'}
-
-getIndexCount :: GameObj -> IO Int
-getIndexCount gs =
-    return $ getIdBoardCount $ gameIdBoard gs
-
-getPlayerAtIndex :: GameObj -> Int -> IO (Maybe Player)
-getPlayerAtIndex gs i =
-    return $ fmap fst $ getIdBoardPiece i $ gameIdBoard gs
-
-getPositionAtIndex :: GameObj -> Int -> IO Int
-getPositionAtIndex gs i =
-    return $ case getIdBoardPiece i $ gameIdBoard gs of
-        Nothing -> -1
-        Just (_,Position pos) -> pos
+            gameActions = actions',
+            gamePrev = Just gs}
 
 data AIReady deriving Typeable
 
@@ -166,14 +176,12 @@ instance SignalKeyClass AIReady where
 instance DefaultClass GameObj where
     classMembers = [
         defPropertyRO "player" getPlayer,
+        defPropertyRO "pieces" getPieces,
         defPropertyRO "targets" getTargets,
         defPropertyRO "actions" getActions,
         defMethod "startAI" startAI,
         defSignal "aiReady" (Proxy :: Proxy AIReady),
-        defMethod "selectTarget" selectTarget,
-        defPropertyRO "indexCount" getIndexCount,
-        defMethod "idxPlayer" getPlayerAtIndex,
-        defMethod "idxPosition" getPositionAtIndex]
+        defMethod "selectTarget" selectTarget]
 
 instance Marshal GameObj where
     type MarshalMode GameObj c d = ModeObjFrom GameObj c
@@ -181,7 +189,7 @@ instance Marshal GameObj where
 
 createGame :: ObjRef () -> IO (ObjRef GameObj)
 createGame _ =
-    newObjectDC $ GameObj newBoard newIdBoard [] Map.empty
+    newObjectDC $ GameObj newBoard newIdBoard [] Map.empty Nothing
 
 main :: IO ()
 main = do
