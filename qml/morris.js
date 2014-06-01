@@ -17,7 +17,8 @@ function clearTargets()
 function updatePieces()
 {
     pieceView.model = game.pieces;
-    if (game.actions.length == 0) {
+    var actions = game.actions.length;
+    if (actions == 0 || actions == 2) {
         anim.restart();
     }
     else {
