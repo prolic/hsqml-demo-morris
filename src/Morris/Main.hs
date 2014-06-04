@@ -96,14 +96,11 @@ data PieceObj = PieceObj {
     pieceCurrPos :: Maybe Position}
     deriving (Typeable, Show)
 
-retIO :: a -> IO a
-retIO = return
-
 instance DefaultClass PieceObj where
     classMembers = [
-        defMethod "player" $ retIO . piecePlayer,
-        defMethod "currPos" $ retIO . pieceCurrPos,
-        defMethod "prevPos" $ retIO . piecePrevPos]
+        defPropertyConst "player" $ return . piecePlayer,
+        defPropertyConst "currPos" $ return . pieceCurrPos,
+        defPropertyConst "prevPos" $ return . piecePrevPos]
 
 instance Marshal PieceObj where
     type MarshalMode PieceObj c d = ModeObjFrom PieceObj c

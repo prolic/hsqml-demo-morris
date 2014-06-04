@@ -30,10 +30,10 @@ Image {
         id: pieceView
         model: [];
         Image {
-            source: modelData.player() == "red" ? "red.svg" : "black.svg";
-            opacity: ((modelData.currPos()!=null?1:0)*board.t)+((modelData.prevPos()!=null?1:0)*(1-board.t));
-            x: (Morris.posIdToX(modelData.currPos()!=null?modelData.currPos():modelData.prevPos())*board.t)+(Morris.posIdToX(modelData.prevPos()!=null?modelData.prevPos():modelData.currPos())*(1-board.t))-width/2;
-            y: (Morris.posIdToY(modelData.currPos()!=null?modelData.currPos():modelData.prevPos())*board.t)+(Morris.posIdToY(modelData.prevPos()!=null?modelData.prevPos():modelData.currPos())*(1-board.t))-height/2;
+            source: modelData.player == "red" ? "red.svg" : "black.svg";
+            opacity: ((modelData.currPos!=null?1:0)*board.t)+((modelData.prevPos!=null?1:0)*(1-board.t));
+            x: (Morris.posIdToX(modelData.currPos!=null?modelData.currPos:modelData.prevPos)*board.t)+(Morris.posIdToX(modelData.prevPos!=null?modelData.prevPos:modelData.currPos)*(1-board.t))-width/2;
+            y: (Morris.posIdToY(modelData.currPos!=null?modelData.currPos:modelData.prevPos)*board.t)+(Morris.posIdToY(modelData.prevPos!=null?modelData.prevPos:modelData.currPos)*(1-board.t))-height/2;
         }
     }
 
