@@ -1,5 +1,4 @@
 var game = null;
-var prevGame = null;
 var redAI = 0;
 var blackAI = 2;
 var aiMove = [];
@@ -29,14 +28,12 @@ function updatePieces()
 function setupGame()
 {
     game = createGame();
-    prevGame = game;
     updateTargets();
     updatePieces();
 }
 
 function selectTarget(i)
 {
-    prevGame = game;
     game = game.selectTarget(i);
     clearTargets();
     updatePieces();
