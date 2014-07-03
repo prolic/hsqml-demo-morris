@@ -4,8 +4,18 @@ import "morris.js" as Morris
 Image {
     id: board;
     source: "board.svg";
-    fillMode: Image.PreserveAspectFit;
-    anchors.fill: parent;
+    width: 320; height: 320;
+
+    property real pw : parent!=null?parent.width:width;
+    property real ph : parent!=null?parent.height:height;
+
+    transform: [
+        Scale {
+            id: scale; xScale: yScale;
+            yScale: Math.min(board.pw/board.width,board.ph/board.height);},
+        Translate {
+            x: (board.pw-board.width*scale.xScale)/2;
+            y: (board.ph-board.height*scale.yScale)/2;}]
 
     property real t;
 
