@@ -1,0 +1,37 @@
+HsQML Morris - Release History
+
+release-0.3.1.1 - 2016.02.11
+
+  * Added change log.
+  * Relaxed constraint on deepseq package.
+
+release-0.3.1.0 - 2014.11.13
+
+  * Added new class of object to represent game pieces.
+  * Added Marshal instance for Player.
+  * Changed accessor methods to be constant properties.
+  * Changed to replace PosListObj with native lists.
+  * Changed to define class for context object inline.
+  * Relaxed dependency on text and removed unused dependency on tagged.
+  * Fixed board to scale correctly with the window.
+  * Fixed missing first part of two step animation.
+
+release-0.3.0.0 - 2014.05.04
+
+  * Ported to HsQML 0.3 API and Qt Quick 2.
+  * Renamed package to hsqml-demo-morris.
+  * Added threading option to cabal file.
+  * Fixed infinite loop when AI player cannot move.
+  * Fixed crash bug in Qt prior to 5.3 with workaround.
+  * Fix name of Paths module.
+
+release-0.2.0.0 - 2013.10.08
+
+  * Ported to HsQML 0.2 API.
+  * Moved AI processing to a separate thread so as to avoid hanging the UI.
+  * Changed cabal file to point to hub.darcs.net for repository.
+  * Relaxed constraint on tagged package.
+
+release-0.1.0.0 - 2012.09.10
+
+  * Initial release.
