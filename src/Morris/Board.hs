@@ -15,7 +15,8 @@ newtype Board = Board Word64 deriving (Eq, Ord, Show)
 
 newtype Position = Position Int deriving (Eq, Ord, Show)
 
-instance NFData Position
+instance NFData Position where
+    rnf x = seq x ()
 
 data FirstAction
     = Place Position
