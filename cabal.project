@@ -4,4 +4,4 @@ packages:
 source-repository-package
   type: git
   location: https://github.com/prolic/hsqml
-  tag: 341fd7214bc75b365194d6df7b2b820457ce60c4
+  tag: d3daf543c358c38032b6f940f028beaca845dc67
