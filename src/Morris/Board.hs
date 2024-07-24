@@ -8,6 +8,7 @@ import Data.Maybe
 import Data.List
 import Data.Map (Map)
 import qualified Data.Map as Map
+import Data.Map.Strict (insertWith)
 import Debug.Trace
 import Numeric
 
@@ -109,7 +110,7 @@ adjacencyMap :: Map Position [Position]
 adjacencyMap =
     let ps = concatMap (\x@(k,v) -> [x,(v,k)]) $
             concatMap (\m -> zip m (tail m)) millPositions
-    in foldr (\(k,v) m -> Map.insertWith' (++) k [v] m) Map.empty ps
+    in foldr (\(k,v) m -> insertWith (++) k [v] m) Map.empty ps
 
 getPlayerPieces :: Player -> Board -> [Position]
 getPlayerPieces player board =
